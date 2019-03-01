@@ -1,7 +1,7 @@
 //: Please build the scheme 'RxSwiftPlayground' first
 import RxSwift
 
-example(of: "never") {
+example(of: "never-1") {
   
   let observable = Observable<Any>.never()
   let bag = DisposeBag()
@@ -21,6 +21,25 @@ example(of: "never") {
   ).disposed(by: bag)
 }
 
+example(of: "never-2") {
+    
+    let observable = Observable<Any>.never()
+    let bag = DisposeBag()
+    
+    observable
+        .debug("DEBUG")
+        .subscribe(
+            onNext: { element in
+                print(element)
+        },
+            onCompleted: {
+                print("Completed")
+        },
+            onDisposed: {
+                print("Disposed")
+        }
+        ).disposed(by: bag)
+}
 /*:
  Copyright (c) 2014-2017 Razeware LLC
  
