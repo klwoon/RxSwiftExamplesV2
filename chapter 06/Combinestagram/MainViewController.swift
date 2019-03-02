@@ -38,6 +38,8 @@ class MainViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    let images = self.images.share()
+    
     images
         .throttle(0.5, scheduler: MainScheduler.instance)
         .subscribe(onNext: { [weak self] photos in
@@ -63,6 +65,7 @@ class MainViewController: UIViewController {
   @IBAction func actionClear() {
     images.accept([])
     imageCache = []
+    navigationItem.leftBarButtonItem = nil
   }
 
   @IBAction func actionSave() {
