@@ -112,3 +112,80 @@ example(of: "skipUntil") {
     trigger.onNext("X")
     subject.onNext("C")
 }
+
+example(of: "take") {
+    let bag = DisposeBag()
+    
+    Observable.of(1, 2, 3, 4, 5, 6)
+        .take(3)
+        .subscribe { print($0) }
+        .disposed(by: bag)
+}
+
+example(of: "takeWhile") {
+    let bag = DisposeBag()
+    
+    Observable.of(2, 2, 4, 4, 6, 6)
+        .enumerated()
+        .takeWhile { index, integer in
+            integer % 2 == 0 && index < 3
+        }
+        .map { $0.element }
+        .subscribe { print($0) }
+        .disposed(by: bag)
+}
+
+example(of: "takeUntil") {
+    let bag = DisposeBag()
+    
+    let subject = PublishSubject<String>()
+    let trigger = PublishSubject<String>()
+    
+    subject
+        .takeUntil(trigger)
+        .subscribe { print($0) }
+        .disposed(by: bag)
+    
+    subject.onNext("1")
+    subject.onNext("2")
+    trigger.onNext("X")
+    subject.onNext("3")
+}
+
+example(of: "distinctUntilChanged") {
+    let bag = DisposeBag()
+    
+    Observable.of("A", "A", "B", "B", "A")
+        .distinctUntilChanged()
+        .subscribe { print($0) }
+        .disposed(by: bag)
+}
+
+example(of: "distinctUntilChanged(_:)") {
+    let bag = DisposeBag()
+    
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .spellOut
+    
+    Observable<NSNumber>.of(10, 110, 20, 200, 210, 310)
+        .distinctUntilChanged { a, b in
+            guard let aWords = formatter.string(from: a)?.components(separatedBy: " "),
+                let bWords = formatter.string(from: b)?.components(separatedBy: " ") else { return false }
+            
+            var containsMatch = false
+            print("a=", aWords)
+            print("b=", bWords)
+            for aWord in aWords {
+                for bWord in bWords {
+                    if aWord == bWord {
+                        containsMatch = true
+                        break
+                    }
+                }
+            }
+            
+            return containsMatch
+        }
+        .subscribe { print($0) }
+        .disposed(by: bag)
+}
