@@ -60,7 +60,7 @@ class ActivityController: UITableViewController {
       guard let strongSelf = self else { return }
       strongSelf.fetchEvents(repo: strongSelf.repo)
     }
-  }   
+  }
     
   func fetchEvents(repo: String) {
     let response = Observable.from(["https://api.github.com/search/repositories?q=language:swift&per_page=5"])
