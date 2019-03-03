@@ -30,10 +30,17 @@ class CategoriesViewController: UIViewController, UITableViewDataSource, UITable
 
     let categories = BehaviorRelay<[EOCategory]>(value: [])
     let bag = DisposeBag()
+    let activityIndicator = UIActivityIndicatorView(style: .gray)
     
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    
+    activityIndicator.hidesWhenStopped = true
+    activityIndicator.color = .blue
+    activityIndicator.startAnimating()
+    navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicator)
+    
     categories
         .subscribe(onNext: { [weak self] _ in
             DispatchQueue.main.async {
@@ -69,6 +76,11 @@ class CategoriesViewController: UIViewController, UITableViewDataSource, UITable
                 }
             }
         }
+        .do(onCompleted: {
+            DispatchQueue.main.async {
+                self.activityIndicator.stopAnimating()
+            }
+        })
     
     eoCategories
         .concat(updatedCategories) // the reason to use concat(_:) is to bind to categories (which in turns emit to tableView for update), tableView is reloaded 3 times, one for /category, twice for /events&status=open /events&status=closed
