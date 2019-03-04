@@ -29,21 +29,119 @@ import MapKit
 
 class ApiController {
 
-  struct Weather {
+  /// The shared instance
+  static var shared = ApiController()
+
+  /// The api key to communicate with openweathermap.org
+  /// Create you own on https://home.openweathermap.org/users/sign_up
+//    let apiKey = BehaviorSubject(value: "e8258e7a11fa94663dd0f175a2109558")
+    let apiKey = BehaviorSubject(value: "")
+    
+  /// API base URL
+  let baseURL = URL(string: "http://api.openweathermap.org/data/2.5")!
+
+  init() {
+    Logging.URLRequests = { request in
+      return true
+    }
+  }
+
+  //MARK: - Api Calls
+
+  func currentWeather(city: String) -> Observable<Weather> {
+    return buildRequest(pathComponent: "weather", params: [("q", city)])
+        .map { json in
+            return Weather(cityName: json["name"].string ?? "Unknown",
+                           temperature: json["main"]["temp"].int ?? -1000,
+                           humidity: json["main"]["humidity"].int ?? 0,
+                           icon: iconNameToChar(icon: json["weather"][0]["icon"].string ?? "e"),
+                           lat: json["coord"]["lat"].double ?? 0,
+                           lon: json["coord"]["lon"].double ?? 0)
+    }
+//    // Placeholder call
+//    return Observable.just(Weather(cityName: city,
+//                                   temperature: 20,
+//                                   humidity: 90,
+//                                   icon: iconNameToChar(icon: "01d")))
+  }
+
+    func currentWeather(lat: Double, lon: Double) -> Observable<Weather> {
+        return buildRequest(pathComponent: "weather", params: [("lat", "\(lat)"), ("lon", "\(lon)")]).map() { json in
+            return Weather(
+                cityName: json["name"].string ?? "Unknown",
+                temperature: json["main"]["temp"].int ?? -1000,
+                humidity: json["main"]["humidity"].int  ?? 0,
+                icon: iconNameToChar(icon: json["weather"][0]["icon"].string ?? "e"),
+                lat: json["coord"]["lat"].double ?? 0,
+                lon: json["coord"]["lon"].double ?? 0
+            )
+        }
+    }
+    
+  //MARK: - Private Methods
+
+  /**
+   * Private method to build a request with RxCocoa
+   */
+  private func buildRequest(method: String = "GET", pathComponent: String, params: [(String, String)]) -> Observable<JSON> {
+
+    let url = baseURL.appendingPathComponent(pathComponent)
+    var request = URLRequest(url: url)
+    let keyQueryItem = URLQueryItem(name: "appid", value: try? apiKey.value())
+    let unitsQueryItem = URLQueryItem(name: "units", value: "metric")
+    let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: true)!
+
+    if method == "GET" {
+      var queryItems = params.map { URLQueryItem(name: $0.0, value: $0.1) }
+      queryItems.append(keyQueryItem)
+      queryItems.append(unitsQueryItem)
+      urlComponents.queryItems = queryItems
+    } else {
+      urlComponents.queryItems = [keyQueryItem, unitsQueryItem]
+
+      let jsonData = try! JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+      request.httpBody = jsonData
+    }
+
+    request.url = urlComponents.url!
+    request.httpMethod = method
+
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+    let session = URLSession.shared
+
+//    return session.rx.data(request: request).map { try JSON(data: $0) }
+    return session.rx.response(request: request)
+        .map() { response, data in
+            if 200 ..< 300 ~= response.statusCode {
+                return try JSON(data: data)
+            } else if response.statusCode == 401 {
+                throw ApiError.invalidKey
+            } else if 400 ..< 500 ~= response.statusCode {
+                throw ApiError.cityNotFound
+            } else {
+                throw ApiError.serverFailure
+            }
+    }
+  }
+
+}
+
+struct Weather {
     let cityName: String
     let temperature: Int
     let humidity: Int
     let icon: String
     let lat: Double
     let lon: Double
-
+    
     static let empty = Weather(
-      cityName: "Unknown",
-      temperature: -1000,
-      humidity: 0,
-      icon: iconNameToChar(icon: "e"),
-      lat: 0,
-      lon: 0
+        cityName: "Unknown",
+        temperature: -1000,
+        humidity: 0,
+        icon: iconNameToChar(icon: "e"),
+        lat: 0,
+        lon: 0
     )
     
     static let dummy = Weather(
@@ -103,93 +201,7 @@ class ApiController {
             context.draw(imageReference!, in: theRect)
         }
     }
-  }
-
-  /// The shared instance
-  static var shared = ApiController()
-
-  /// The api key to communicate with openweathermap.org
-  /// Create you own on https://home.openweathermap.org/users/sign_up
-  private let apiKey = "e8258e7a11fa94663dd0f175a2109558"
-
-  /// API base URL
-  let baseURL = URL(string: "http://api.openweathermap.org/data/2.5")!
-
-  init() {
-    Logging.URLRequests = { request in
-      return true
-    }
-  }
-
-  //MARK: - Api Calls
-
-  func currentWeather(city: String) -> Observable<Weather> {
-    return buildRequest(pathComponent: "weather", params: [("q", city)])
-        .map { json in
-            return Weather(cityName: json["name"].string ?? "Unknown",
-                           temperature: json["main"]["temp"].int ?? -1000,
-                           humidity: json["main"]["humidity"].int ?? 0,
-                           icon: iconNameToChar(icon: json["weather"][0]["icon"].string ?? "e"),
-                           lat: json["coord"]["lat"].double ?? 0,
-                           lon: json["coord"]["lon"].double ?? 0)
-    }
-//    // Placeholder call
-//    return Observable.just(Weather(cityName: city,
-//                                   temperature: 20,
-//                                   humidity: 90,
-//                                   icon: iconNameToChar(icon: "01d")))
-  }
-
-    func currentWeather(lat: Double, lon: Double) -> Observable<Weather> {
-        return buildRequest(pathComponent: "weather", params: [("lat", "\(lat)"), ("lon", "\(lon)")]).map() { json in
-            return Weather(
-                cityName: json["name"].string ?? "Unknown",
-                temperature: json["main"]["temp"].int ?? -1000,
-                humidity: json["main"]["humidity"].int  ?? 0,
-                icon: iconNameToChar(icon: json["weather"][0]["icon"].string ?? "e"),
-                lat: json["coord"]["lat"].double ?? 0,
-                lon: json["coord"]["lon"].double ?? 0
-            )
-        }
-    }
-    
-  //MARK: - Private Methods
-
-  /**
-   * Private method to build a request with RxCocoa
-   */
-  private func buildRequest(method: String = "GET", pathComponent: String, params: [(String, String)]) -> Observable<JSON> {
-
-    let url = baseURL.appendingPathComponent(pathComponent)
-    var request = URLRequest(url: url)
-    let keyQueryItem = URLQueryItem(name: "appid", value: apiKey)
-    let unitsQueryItem = URLQueryItem(name: "units", value: "metric")
-    let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: true)!
-
-    if method == "GET" {
-      var queryItems = params.map { URLQueryItem(name: $0.0, value: $0.1) }
-      queryItems.append(keyQueryItem)
-      queryItems.append(unitsQueryItem)
-      urlComponents.queryItems = queryItems
-    } else {
-      urlComponents.queryItems = [keyQueryItem, unitsQueryItem]
-
-      let jsonData = try! JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
-      request.httpBody = jsonData
-    }
-
-    request.url = urlComponents.url!
-    request.httpMethod = method
-
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-    let session = URLSession.shared
-
-    return session.rx.data(request: request).map { try JSON(data: $0) }    
-  }
-
 }
-
 /**
  * Maps an icon information from the API to a local char
  * Source: http://openweathermap.org/weather-conditions
@@ -234,4 +246,10 @@ fileprivate func imageFromText(text: NSString, font: UIFont) -> UIImage {
     UIGraphicsEndImageContext()
     
     return image ?? UIImage()
+}
+
+enum ApiError: Error {
+    case cityNotFound
+    case serverFailure
+    case invalidKey
 }

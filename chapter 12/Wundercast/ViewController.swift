@@ -38,10 +38,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var geoLocationButton: UIButton!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var mapButton: UIButton!
+    @IBOutlet weak var keyButton: UIButton!
     
     let bag = DisposeBag()
     let locationManager = CLLocationManager()
-    
+    var cache = [String: Weather]()
+    var keyTextField: UITextField?
     
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -59,6 +61,27 @@ class ViewController: UIViewController {
 //        })
 //        .disposed(by: bag)
     
+    keyButton.rx.tap.subscribe(onNext: {
+        self.requestKey()
+    }).disposed(by:bag)
+    
+    // error handling
+    let maxAttempts = 4
+    
+    let retryHandler: (Observable<Error>) -> Observable<Int> = { e in
+        return e.enumerated().flatMap { attempt, error -> Observable<Int> in
+            if attempt >= maxAttempts - 1 {
+                return Observable.error(error)
+            } else if let casted = error as? ApiError, casted == .invalidKey {
+                return ApiController.shared.apiKey
+                    .filter { $0 != "" }
+                    .map { _ in return 1 }
+            }
+            print("== retrying after \(attempt + 1) seconds ==")
+            return Observable<Int>.timer(Double(attempt + 1), scheduler: MainScheduler.instance).take(1)
+        }
+    }
+    
     //  Observable<String?> from UITextField after press Search
     let searchInput = searchCityName.rx
         .controlEvent(.editingDidEndOnExit)
@@ -70,7 +93,24 @@ class ViewController: UIViewController {
     let textSearch = searchInput
         .flatMap { text in
             return ApiController.shared.currentWeather(city: text ?? "Error")
-                .catchErrorJustReturn(ApiController.Weather.dummy)
+                .do(onNext: { data in
+                    if let text = text {
+                        self.cache[text] = data
+                    }
+                }, onError: { [weak self] e in
+                    guard let strongSelf = self else { return }
+                    DispatchQueue.main.async {
+                        strongSelf.showError(error: e)
+                    }
+                })
+                .retryWhen(retryHandler)
+                .catchError { error in
+                    if let text = text, let cacheData = self.cache[text] {
+                        return Observable.just(cacheData)
+                    } else {
+                        return Observable.just(Weather.empty)
+                    }
+                }
         }
         .share(replay: 1, scope: .forever) // must include this otherwise API will sent twice (being subscribe twice)
     
@@ -101,7 +141,7 @@ class ViewController: UIViewController {
         .flatMap { location in
             return ApiController.shared.currentWeather(lat: location.coordinate.latitude,
                                                        lon: location.coordinate.longitude)
-                .catchErrorJustReturn(ApiController.Weather.dummy)
+                .catchErrorJustReturn(Weather.dummy)
         }
     
     // map
@@ -113,7 +153,7 @@ class ViewController: UIViewController {
         .flatMap { coordinate in
             return ApiController.shared.currentWeather(lat: coordinate.latitude,
                                                        lon: coordinate.longitude)
-                .catchErrorJustReturn(ApiController.Weather.dummy)
+                .catchErrorJustReturn(Weather.dummy)
         }
     
     mapButton.rx.tap
@@ -125,7 +165,7 @@ class ViewController: UIViewController {
     // merge two observables, one from UITextField, one from UIButton
     let search = Observable.from([geoSearch, textSearch, mapSearch])
         .merge()
-        .asDriver(onErrorJustReturn: ApiController.Weather.dummy)
+        .asDriver(onErrorJustReturn: Weather.dummy)
     
     let running = Observable.from([searchInput.map { _ in true },
                                    geoInput.map { _ in true },
@@ -207,6 +247,20 @@ class ViewController: UIViewController {
         .disposed(by: bag)
   }
 
+    func showError(error e: Error) {
+        if let e = e as? ApiError {
+            switch e {
+            case .cityNotFound:
+                InfoView.showIn(viewController: self, message: "City name is invalid")
+            case .serverFailure:
+                InfoView.showIn(viewController: self, message: "Server error")
+            case .invalidKey:
+                InfoView.showIn(viewController: self, message: "Key is invalid")
+            }
+        } else {
+            InfoView.showIn(viewController: self, message: "An error has occured")
+        }
+    }
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
   }
@@ -236,13 +290,33 @@ class ViewController: UIViewController {
     iconLabel.textColor = UIColor.cream
     cityNameLabel.textColor = UIColor.cream
   }
+    
+    func requestKey() {
+        func configurationTextField(textField: UITextField!) {
+            self.keyTextField = textField
+        }
+        
+        let alert = UIAlertController(title: "Api Key",
+                                      message: "Add the api key:",
+                                      preferredStyle: .alert)
+        
+        alert.addTextField(configurationHandler: configurationTextField)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
+            ApiController.shared.apiKey.onNext(self.keyTextField?.text ?? "")
+        })
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+        
+        self.present(alert, animated: true)
+    }
 }
 
 extension ViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let overlay = overlay as? ApiController.Weather.Overlay {
-            let overlayView = ApiController.Weather.OverlayView(overlay: overlay, overlayIcon: overlay.icon)
+        if let overlay = overlay as? Weather.Overlay {
+            let overlayView = Weather.OverlayView(overlay: overlay, overlayIcon: overlay.icon)
             return overlayView
         }
         return MKOverlayRenderer()

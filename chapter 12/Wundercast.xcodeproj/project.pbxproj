@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6987ADA3222D2C1D003B21FE /* MKMapView+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6987ADA2222D2C1C003B21FE /* MKMapView+Rx.swift */; };
+		6987ADA6222D5867003B21FE /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6987ADA4222D5866003B21FE /* InfoView.swift */; };
+		6987ADA7222D5867003B21FE /* InfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6987ADA5222D5866003B21FE /* InfoView.xib */; };
 		69B145F1222CFC5D00437B81 /* CLLocationManager+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B145F0222CFC5D00437B81 /* CLLocationManager+Rx.swift */; };
 		CA64900EFE1D9F43973A260F /* Pods_Wundercast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4098AFCCA291187AB4A1327B /* Pods_Wundercast.framework */; };
 		CB4D69411DE9A7D100DC0488 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4D69401DE9A7D100DC0488 /* AppDelegate.swift */; };
@@ -26,6 +28,8 @@
 /* Begin PBXFileReference section */
 		4098AFCCA291187AB4A1327B /* Pods_Wundercast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wundercast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6987ADA2222D2C1C003B21FE /* MKMapView+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MKMapView+Rx.swift"; sourceTree = "<group>"; };
+		6987ADA4222D5866003B21FE /* InfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InfoView.swift; path = Wundercast/Utils/InfoView.swift; sourceTree = SOURCE_ROOT; };
+		6987ADA5222D5866003B21FE /* InfoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = InfoView.xib; path = Wundercast/Utils/InfoView.xib; sourceTree = SOURCE_ROOT; };
 		69B145F0222CFC5D00437B81 /* CLLocationManager+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CLLocationManager+Rx.swift"; sourceTree = "<group>"; };
 		8CF08882048DB0620980ACC9 /* Pods-Wundercast.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wundercast.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Wundercast/Pods-Wundercast.debug.xcconfig"; sourceTree = "<group>"; };
 		A8FEC475BD4840CDBFA8E9B0 /* Pods-Wundercast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wundercast.release.xcconfig"; path = "Pods/Target Support Files/Pods-Wundercast/Pods-Wundercast.release.xcconfig"; sourceTree = "<group>"; };
@@ -76,6 +80,8 @@
 		69B145F2222CFC6600437B81 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				6987ADA4222D5866003B21FE /* InfoView.swift */,
+				6987ADA5222D5866003B21FE /* InfoView.xib */,
 				6987ADA2222D2C1C003B21FE /* MKMapView+Rx.swift */,
 				69B145F0222CFC5D00437B81 /* CLLocationManager+Rx.swift */,
 			);
@@ -209,6 +215,7 @@
 				CB4D696B1DE9AD7C00DC0488 /* LICENSE in Resources */,
 				CB4D694B1DE9A7D100DC0488 /* LaunchScreen.storyboard in Resources */,
 				CB4D69481DE9A7D100DC0488 /* Assets.xcassets in Resources */,
+				6987ADA7222D5867003B21FE /* InfoView.xib in Resources */,
 				CB4D69611DE9A7F100DC0488 /* Podfile in Resources */,
 				CB4D69461DE9A7D100DC0488 /* Main.storyboard in Resources */,
 				CB4D69691DE9AD6200DC0488 /* weather.ttf in Resources */,
@@ -267,6 +274,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6987ADA6222D5867003B21FE /* InfoView.swift in Sources */,
 				CB4D69431DE9A7D100DC0488 /* ViewController.swift in Sources */,
 				CB4D69711DE9C70100DC0488 /* Colors.swift in Sources */,
 				CB4D69411DE9A7D100DC0488 /* AppDelegate.swift in Sources */,
