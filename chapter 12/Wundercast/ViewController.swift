@@ -96,22 +96,24 @@ class ViewController: UIViewController {
     }
     
     // Observable<Weather> from API server, input coordinates from above
-    let geoSearch = geoLocation.flatMap { location in
-        return ApiController.shared.currentWeather(lat: location.coordinate.latitude,
-                                                   lon: location.coordinate.longitude)
-            .catchErrorJustReturn(ApiController.Weather.dummy)
-    }
+    let geoSearch = geoLocation
+        .flatMap { location in
+            return ApiController.shared.currentWeather(lat: location.coordinate.latitude,
+                                                       lon: location.coordinate.longitude)
+                .catchErrorJustReturn(ApiController.Weather.dummy)
+        }
     
     // map
     let mapInput = mapView.rx.regionDidChangeAnimated
         .skip(1)
         .map { _ in self.mapView.centerCoordinate }
     
-    let mapSearch = mapInput.flatMap { coordinate in
-        return ApiController.shared.currentWeather(lat: coordinate.latitude,
-                                                   lon: coordinate.longitude)
-            .catchErrorJustReturn(ApiController.Weather.dummy)
-    }
+    let mapSearch = mapInput
+        .flatMap { coordinate in
+            return ApiController.shared.currentWeather(lat: coordinate.latitude,
+                                                       lon: coordinate.longitude)
+                .catchErrorJustReturn(ApiController.Weather.dummy)
+        }
     
     mapButton.rx.tap
         .subscribe(onNext: {
@@ -195,6 +197,12 @@ class ViewController: UIViewController {
     
     search.map { [$0.overlay()] }
         .drive(mapView.rx.overlays)
+        .disposed(by: bag)
+    
+    Observable.from([geoSearch, textSearch])
+        .merge()
+        .map { $0.coordinate }
+        .bind(to: mapView.rx.location)
         .disposed(by: bag)
   }
 

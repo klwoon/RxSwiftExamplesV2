@@ -45,6 +45,20 @@ extension Reactive where Base: MKMapView {
         }
     }
     
+    // wrong answer
+    var moveMap: Binder<CLLocationCoordinate2D> {
+        return Binder(self.base) { mapView, coordinate in
+            mapView.setCenter(coordinate, animated: true)
+        }
+    }
+    
+    public var location: Binder<CLLocationCoordinate2D> {
+        return Binder(self.base) { mapView, coordinate in
+            let span = MKCoordinateSpan(latitudeDelta: 2, longitudeDelta: 2)
+            mapView.region = MKCoordinateRegion(center: coordinate, span: span)
+        }
+    }
+    
     public var regionDidChangeAnimated: ControlEvent<Bool> {
         let source = delegate
             .methodInvoked(#selector(MKMapViewDelegate.mapView(_:regionDidChangeAnimated:)))
