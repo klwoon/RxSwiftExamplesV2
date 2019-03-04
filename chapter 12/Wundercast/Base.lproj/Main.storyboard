@@ -67,6 +67,14 @@
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Uev-Sh-1aT">
                                 <rect key="frame" x="144" y="159" width="51" height="31"/>
                             </switch>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="Qcj-ML-Rax">
+                                <rect key="frame" x="169" y="315" width="37" height="37"/>
+                            </activityIndicatorView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2b6-RZ-bPl">
+                                <rect key="frame" x="16" y="617" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -82,14 +90,18 @@
                             <constraint firstItem="CvG-51-WJq" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="16" id="LuH-bS-Wr5"/>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="top" secondItem="aYm-dp-fOW" secondAttribute="bottom" constant="8" id="MFT-Kh-TpX"/>
                             <constraint firstItem="fn5-hY-7os" firstAttribute="top" secondItem="jQQ-9b-2rA" secondAttribute="bottom" constant="8" id="Rba-DY-MEe"/>
+                            <constraint firstItem="Qcj-ML-Rax" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Rfs-7h-G32"/>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="top" secondItem="x4a-i8-beX" secondAttribute="bottom" constant="8" id="VFJ-kt-pMI"/>
+                            <constraint firstItem="Qcj-ML-Rax" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="qNA-vg-6k4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="CvG-51-WJq" secondAttribute="trailing" id="rE1-nx-616"/>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="20" id="ruZ-Hl-zEh"/>
                             <constraint firstItem="aYm-dp-fOW" firstAttribute="trailing" secondItem="jQQ-9b-2rA" secondAttribute="trailing" id="tOM-kL-ZZw"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="Qcj-ML-Rax" id="1CZ-63-c6K"/>
                         <outlet property="cityNameLabel" destination="fn5-hY-7os" id="FJD-r9-Dgm"/>
+                        <outlet property="geoLocationButton" destination="2b6-RZ-bPl" id="lxj-jh-D2M"/>
                         <outlet property="humidityLabel" destination="aYm-dp-fOW" id="ACB-jg-cWC"/>
                         <outlet property="iconLabel" destination="jQQ-9b-2rA" id="CFl-ge-t02"/>
                         <outlet property="searchCityName" destination="CvG-51-WJq" id="yXf-Qu-AkM"/>

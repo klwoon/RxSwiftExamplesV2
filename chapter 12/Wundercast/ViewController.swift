@@ -23,6 +23,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import CoreLocation
 
 class ViewController: UIViewController {
 
@@ -32,8 +33,11 @@ class ViewController: UIViewController {
   @IBOutlet weak var iconLabel: UILabel!
   @IBOutlet weak var cityNameLabel: UILabel!
     @IBOutlet weak var tempSwitch: UISwitch!
-
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var geoLocationButton: UIButton!
+    
     let bag = DisposeBag()
+    let locationManager = CLLocationManager()
     
     
   override func viewDidLoad() {
@@ -42,27 +46,97 @@ class ViewController: UIViewController {
 
     style()
 
-    ApiController.shared.currentWeather(city: "RxCity")
-        .observeOn(MainScheduler.instance)
-        .subscribe(onNext: { data in
-            self.tempLabel.text = "\(data.temperature)° C"
-            self.iconLabel.text = data.icon
-            self.humidityLabel.text = "\(data.humidity)%"
-            self.cityNameLabel.text = data.cityName
-        })
-        .disposed(by: bag)
+//    ApiController.shared.currentWeather(city: "RxCity")
+//        .observeOn(MainScheduler.instance)
+//        .subscribe(onNext: { data in
+//            self.tempLabel.text = "\(data.temperature)° C"
+//            self.iconLabel.text = data.icon
+//            self.humidityLabel.text = "\(data.humidity)%"
+//            self.cityNameLabel.text = data.cityName
+//        })
+//        .disposed(by: bag)
     
-    let search = searchCityName.rx
+    //  Observable<String?> from UITextField after press Search
+    let searchInput = searchCityName.rx
         .controlEvent(.editingDidEndOnExit)
         .asObservable()
         .map { self.searchCityName.text }
         .filter { ($0 ?? "").count > 0 }
+    
+    //  Observable<Weather> from API server with the search text above
+    let textSearch = searchInput
         .flatMap { text in
             return ApiController.shared.currentWeather(city: text ?? "Error")
+                .catchErrorJustReturn(ApiController.Weather.dummy)
         }
-        .asDriver(onErrorJustReturn: ApiController.Weather.empty)
     
-    search.map { "\($0.temperature)" }
+    // Observable<Void> from button tap, which starts asking locations
+    let geoInput = geoLocationButton.rx.tap
+        .asObservable()
+        .do(onNext: {
+            self.locationManager.requestWhenInUseAuthorization()
+            self.locationManager.startUpdatingLocation()
+        })
+    
+    // Observable<CLLocation> from didUpdateLocations
+    let currentLocation = locationManager.rx.didUpdateLocations
+        .map { locations in
+            return locations[0]
+        }
+        .filter { location in
+            return location.horizontalAccuracy < kCLLocationAccuracyHundredMeters
+    }
+    
+    // Observable<CLLocation> from above, taking 1 result only
+    let geoLocation = geoInput.flatMap {
+        return currentLocation.take(1)
+    }
+    
+    // Observable<Weather> from API server, input coordinates from above
+    let geoSearch = geoLocation.flatMap { location in
+        return ApiController.shared.currentWeather(lat: location.coordinate.latitude,
+                                                   lon: location.coordinate.longitude)
+            .catchErrorJustReturn(ApiController.Weather.dummy)
+    }
+    
+    // merge two observables, one from UITextField, one from UIButton
+    let search = Observable.from([geoSearch, textSearch])
+        .merge()
+        .asDriver(onErrorJustReturn: ApiController.Weather.dummy)
+    
+    let running = Observable.from([searchInput.map { _ in true },
+                                   geoInput.map { _ in true },
+                                   search.map { _ in false }.asObservable()])
+        .merge()
+        .startWith(true)
+        .asDriver(onErrorJustReturn: false)
+    
+    running
+        .skip(1)
+        .drive(activityIndicator.rx.isAnimating)
+        .disposed(by: bag)
+    
+    running
+        .drive(tempLabel.rx.isHidden)
+        .disposed(by: bag)
+
+    running
+        .drive(iconLabel.rx.isHidden)
+        .disposed(by: bag)
+
+    running
+        .drive(humidityLabel.rx.isHidden)
+        .disposed(by: bag)
+
+    running
+        .drive(cityNameLabel.rx.isHidden)
+        .disposed(by: bag)
+
+    running
+        .drive(tempSwitch.rx.isHidden)
+        .disposed(by: bag)
+    
+    search.map { "\($0.temperature)° C" }
         .drive(tempLabel.rx.text)
         .disposed(by: bag)
     
@@ -77,6 +151,25 @@ class ViewController: UIViewController {
     search.map { $0.cityName }
         .drive(cityNameLabel.rx.text)
         .disposed(by:bag)
+    
+    
+    locationManager.rx.didUpdateLocations
+        .subscribe(onNext: { locations in
+            print(locations)
+        })
+        .disposed(by:bag)
+    
+    Driver.combineLatest(search, tempSwitch.rx.isOn.asDriver()) { data, temp -> String in
+            if temp {
+                return "\(data.temperature)° C"
+            } else {
+                return "\(Double(data.temperature) * 1.8 + Double(32))° F"
+            }
+        }
+        .drive(tempLabel.rx.text)
+        .disposed(by:bag)
+    
+ 
   }
 
   override func viewDidAppear(_ animated: Bool) {
