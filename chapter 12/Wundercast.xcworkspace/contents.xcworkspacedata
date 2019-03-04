@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/woon/Documents/RxSwiftExamplesV2/chapter 12/Wundercast/Extensions/MKMapView+Rx.swift">
+   </FileRef>
+   <FileRef
       location = "group:Wundercast.xcodeproj">
    </FileRef>
    <FileRef

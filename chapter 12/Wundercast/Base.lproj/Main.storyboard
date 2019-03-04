@@ -70,10 +70,18 @@
                             <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="Qcj-ML-Rax">
                                 <rect key="frame" x="169" y="315" width="37" height="37"/>
                             </activityIndicatorView>
+                            <mapView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="rdc-cf-gf2">
+                                <rect key="frame" x="16" y="85" width="343" height="582"/>
+                            </mapView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2b6-RZ-bPl">
-                                <rect key="frame" x="16" y="617" width="46" height="30"/>
+                                <rect key="frame" x="24" y="617" width="30" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="Geo"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Ju-wV-78F">
+                                <rect key="frame" x="321" y="617" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Map"/>
                             </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -83,7 +91,9 @@
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="32" id="3EQ-YY-BbS"/>
                             <constraint firstItem="Uev-Sh-1aT" firstAttribute="centerY" secondItem="x4a-i8-beX" secondAttribute="centerY" id="4Dd-kG-iFx"/>
                             <constraint firstItem="fn5-hY-7os" firstAttribute="width" secondItem="jQQ-9b-2rA" secondAttribute="width" id="6Ay-YA-dE9"/>
+                            <constraint firstItem="rdc-cf-gf2" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="DNa-5B-WrB"/>
                             <constraint firstItem="fn5-hY-7os" firstAttribute="centerX" secondItem="jQQ-9b-2rA" secondAttribute="centerX" id="DQs-GR-s4h"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="rdc-cf-gf2" secondAttribute="trailing" id="E4G-PC-Jsk"/>
                             <constraint firstAttribute="trailing" secondItem="jQQ-9b-2rA" secondAttribute="trailing" constant="32" id="I7g-p4-Sbb"/>
                             <constraint firstItem="x4a-i8-beX" firstAttribute="leading" secondItem="jQQ-9b-2rA" secondAttribute="leading" id="Ice-tx-Qny"/>
                             <constraint firstItem="CvG-51-WJq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="LfL-fC-hE2"/>
@@ -94,8 +104,10 @@
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="top" secondItem="x4a-i8-beX" secondAttribute="bottom" constant="8" id="VFJ-kt-pMI"/>
                             <constraint firstItem="Qcj-ML-Rax" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="qNA-vg-6k4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="CvG-51-WJq" secondAttribute="trailing" id="rE1-nx-616"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="rdc-cf-gf2" secondAttribute="bottom" id="rta-bX-cDw"/>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="20" id="ruZ-Hl-zEh"/>
                             <constraint firstItem="aYm-dp-fOW" firstAttribute="trailing" secondItem="jQQ-9b-2rA" secondAttribute="trailing" id="tOM-kL-ZZw"/>
+                            <constraint firstItem="rdc-cf-gf2" firstAttribute="top" secondItem="CvG-51-WJq" secondAttribute="bottom" constant="10" id="upt-e0-a3b"/>
                         </constraints>
                     </view>
                     <connections>
@@ -104,6 +116,8 @@
                         <outlet property="geoLocationButton" destination="2b6-RZ-bPl" id="lxj-jh-D2M"/>
                         <outlet property="humidityLabel" destination="aYm-dp-fOW" id="ACB-jg-cWC"/>
                         <outlet property="iconLabel" destination="jQQ-9b-2rA" id="CFl-ge-t02"/>
+                        <outlet property="mapButton" destination="3Ju-wV-78F" id="FRc-ec-gm9"/>
+                        <outlet property="mapView" destination="rdc-cf-gf2" id="lbH-GI-Hyx"/>
                         <outlet property="searchCityName" destination="CvG-51-WJq" id="yXf-Qu-AkM"/>
                         <outlet property="tempLabel" destination="x4a-i8-beX" id="4To-Ng-1e9"/>
                         <outlet property="tempSwitch" destination="Uev-Sh-1aT" id="EAb-ja-D5Y"/>

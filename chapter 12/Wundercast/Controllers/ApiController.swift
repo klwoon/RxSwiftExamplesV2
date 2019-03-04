@@ -59,16 +59,19 @@ class ApiController {
         return CLLocationCoordinate2D(latitude: lat, longitude: lon)
     }
     
-//    func overlay() -> Overlay {
-//        let coordinates: [CLLocationCoordinate2D] = [
-//            CLLocationCoordinate2D(latitude: lat - 0.25, longitude: lon - 0.25),
-//            CLLocationCoordinate2D(latitude: lat + 0.25, longitude: lon + 0.25)
-//        ]
-//        let points = coordinates.map { MKMapPoint($0) }
-//        let rects = points.map { MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }
+    func overlay() -> Overlay {
+        let coordinates: [CLLocationCoordinate2D] = [
+            CLLocationCoordinate2D(latitude: lat - 0.25, longitude: lon - 0.25),
+            CLLocationCoordinate2D(latitude: lat + 0.25, longitude: lon + 0.25)
+        ]
+        let points = coordinates.map { MKMapPoint($0) }
+        let rects = points.map { MKMapRect(origin: $0, size: MKMapSize(width: 0, height: 0)) }
 //        let fittingRect = rects.reduce(MKMapRect.null, MKMapRectUnion)
-//        return Overlay(icon: icon, coordinate: coordinate, boundingMapRect: fittingRect)
-//    }
+        let fittingRect = rects.reduce(MKMapRect.null) { (result, rect) -> MKMapRect in
+            return result.union(rect)
+        }
+        return Overlay(icon: icon, coordinate: coordinate, boundingMapRect: fittingRect)
+    }
     
     public class Overlay: NSObject, MKOverlay {
         var coordinate: CLLocationCoordinate2D
