@@ -72,6 +72,7 @@ class ViewController: UIViewController {
             return ApiController.shared.currentWeather(city: text ?? "Error")
                 .catchErrorJustReturn(ApiController.Weather.dummy)
         }
+        .share(replay: 1, scope: .forever) // must include this otherwise API will sent twice (being subscribe twice)
     
     // Observable<Void> from button tap, which starts asking locations
     let geoInput = geoLocationButton.rx.tap
