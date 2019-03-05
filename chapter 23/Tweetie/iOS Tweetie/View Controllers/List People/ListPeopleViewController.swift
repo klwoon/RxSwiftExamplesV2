@@ -43,7 +43,7 @@ class ListPeopleViewController: UIViewController {
     super.viewDidLoad()
     title = "List Members"
     tableView.estimatedRowHeight = 90
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     bindUI()
   }
 

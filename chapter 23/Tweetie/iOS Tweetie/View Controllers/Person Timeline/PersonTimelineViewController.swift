@@ -46,7 +46,7 @@ class PersonTimelineViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     tableView.estimatedRowHeight = 90
-    tableView.rowHeight = UITableViewAutomaticDimension
+    tableView.rowHeight = UITableView.automaticDimension
     title = "Loading..."
     bindUI()
   }

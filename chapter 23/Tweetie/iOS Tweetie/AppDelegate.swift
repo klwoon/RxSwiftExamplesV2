@@ -33,9 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   let list = (username: "icanzilb", slug: "RxSwift")
   let testing = NSClassFromString("XCTest") != nil
 
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-    TwitterAccount.set(key: "placeholder",
-                       secret: "placeholder")
+  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    TwitterAccount.set(key: "5PxDBhzlpTybi8pd5brP8Gs9T",
+                       secret: "NACTJAbA3rMCScfpcuLLPnEeyAjMJPv84t77KoBGio5spRQhxE")
 
     if !testing {
       let feedNavigation = window!.rootViewController! as! UINavigationController
