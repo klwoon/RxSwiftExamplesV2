@@ -40,7 +40,7 @@ class ListPeopleViewModel {
   let account: Driver<TwitterAccount.AccountStatus>
 
   // MARK: - Output
-  let people = Variable<[User]?>(nil)
+    let people = BehaviorRelay<[User]?>(value: nil)
 
   // MARK: - Init
   init(account: Driver<TwitterAccount.AccountStatus>,

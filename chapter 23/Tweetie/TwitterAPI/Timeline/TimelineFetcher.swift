@@ -34,10 +34,10 @@ class TimelineFetcher {
 
   private let timerDelay: TimeInterval = 30
   private let bag = DisposeBag()
-  private let feedCursor = Variable<TimelineCursor>(.none)
+    private let feedCursor = BehaviorRelay<TimelineCursor>(value: .none)
 
   // MARK: input
-  let paused = Variable<Bool>(false)
+    let paused = BehaviorRelay<Bool>(value: false)
 
   // MARK: output
   let timeline: Observable<[Tweet]>
@@ -85,7 +85,7 @@ class TimelineFetcher {
       .filter { $0 != nil }
       .map { $0! }
 
-    let feedCursor = Variable<TimelineCursor>(.none)
+    let feedCursor = BehaviorRelay<TimelineCursor>(value: .none)
 
     // Re-fetch the timeline
 
