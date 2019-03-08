@@ -53,6 +53,12 @@ class ListPeopleViewController: UIViewController {
       .drive(onNext: { [weak self] _ in self?.tableView.reloadData() })
       .disposed(by: bag)
 
+    viewModel.people.asDriver(onErrorJustReturn: [])
+        .map { people in
+            (people == nil) ? false : true
+        }
+        .drive(messageView.rx.isHidden)
+        .disposed(by: bag)
     //show message when no account available
     
   }
